@@ -22,18 +22,6 @@ app.get("/", (req, res) => {
 
 });
 
-// app.post("/addname", (req, res) => {
-//     var myData = new User(req.body);
-//     myData.save()
-//         .then(item => {
-//             res.send("item saved to database");
-//         })
-//         .catch(err => {
-//             res.status(400).send("unable to save to database");
-//         });
-
-// });
-
 app.listen(port, () => {
     console.log("Server listening on port " + port);
 });
