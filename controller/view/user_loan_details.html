@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Put Loan Detail </title>
+    <style>
+        body {
+            text-align: center;
+            background: rgb(42, 165, 104);
+        }
+
+        h1 {
+            color: rgb(128, 15, 0);
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <form  action="/user_details" method="post" style="border:1px solid #ccc">
+
+    <h1>Welcome to our Loan detail page </h1>
+
+    <!-- <P>We have Three type of loan select which type of do you want </P> -->
+    <label for="name"><b>Name</b></label>
+    <input type="text" placeholder="Enter Name" name="Name" required>
+    <br>
+    <br>
+    <label for="surName"><b>surName</b></label>
+    <input type="text" placeholder="Enter surName" name="surName" required>
+    <br>
+    <br>
+    <label for="Father-Name"><b>Father-Name</b></label>
+    <input type="text" placeholder="Enter Father-Name" name="Father_Name" required>
+    <br>
+    <br>
+    <label for="service"><b>service</b></label>
+    <input type="text" placeholder="Enter your work name" name="service_detail" required>
+    <br>
+    <br>
+    <label for="your_intension"><b>are you sure. you realy want to loan if yes so press 'yes' if not so press 'No'
+        </b></label>
+    <br>
+    <input type="text" placeholder="Enter your mind thing" name="yes_not" required>
+    <br>
+    <br>
+    <label>Enter Your MOBILE NUMBER</label><br>
+    <input type="text" placeholder="Enter MOBILE number..."  name="number" required>
+    <br>
+    <br>
+    <label for="browser">Which Price Loan do you want:</label>
+    <br>
+    <input list="browsers" name="browser" id="browser">
+    <datalist id="browsers">
+        <option value="20 Lac">
+        <option value="10 Lac">
+        <option value="5 Lac">
+        <option value="2 Lac">
+    </datalist>
+    <br>
+    <button type="submit" class="signupbtn">Submit
+    <!-- <a href="http://localhost:5000/20_lac_loan">submit</a> -->
+    </button>
+</form>
+</body>
+
+</html>

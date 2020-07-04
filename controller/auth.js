@@ -5,10 +5,14 @@ const path = require('path');
 var bodyParser = require("body-parser");
 let jwt = require('jsonwebtoken');
 var app = express();
+// var app=express.Router()
+// app.use(express.json());
+
+
 var nJwt_data = require('njwt');
 
-app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 app.get('/loan_app', function (req, res) {
@@ -21,6 +25,24 @@ app.get('/signup_page', function (req, res) {
 
 app.get('/login_page', function (req, res) {
     res.sendFile(path.join(__dirname + '/view/login_page.html'));
+});
+
+app.get('/loan_intro', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/user_details.html'));
+});
+
+app.get('/user_loan_intro', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/user_loan_details.html'));
+});
+
+
+app.get('/20_lac_loan', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/20_lac_loan_page.html'));
+});
+
+
+app.get('/user_loan_submition', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/user_loan_submition.html'));
 });
 
 
@@ -36,27 +58,18 @@ app.post('/sign_up', verifyToken, (req, res, next) => {
             var response = knex1.insert_token(token_data)
             response.then((data) => {
                 res.json({
-                    message: "post created....",
-                    data: data
+                    message: "Your sign up sucessfully complete"
                 });
             }).catch((err) => {
                 console.log(err)
             })
         }
-        //    console.log(token_data)
-
-        //    res.send(user_name)
+      
     })
 });
 
 
 app.post("/login", (req, res, next) => {
-    // const user_token = knex1.select()
-    // user_token.then((data)=>{
-    //     const str_token = data[1].token
-    //     console.log(str_token)
-
-
     const user = {
         "name": req.body.fullname,
         "emails": req.body.email,
@@ -65,7 +78,6 @@ app.post("/login", (req, res, next) => {
     }
 
     jwt.sign(user, "SECRET_KEY", (err, tokens) => {
-
         const user_token = knex1.select()
         user_token.then((data) => {
             const str_token = data[1].token
@@ -75,23 +87,13 @@ app.post("/login", (req, res, next) => {
                 })         
                }else{
                 res.json({
-                    token: "your email not exists" 
+                    token: "your email not exists" + tokens
                 })     
                }
             })
 
-        // }).catch((err)=>{
-        // console.log(err)
-        // })
-
     })
 })
-
-// res.json({
-//     message:"your login data",
-//     data : data
-// });
-
 
 ///Token verification function.
 
@@ -110,15 +112,37 @@ function verifyToken(req, res, next) {
     var bearerToken = jwt_web.compact();
 
     if (typeof jwt_web !== 'undefined') {
-        // const bearerToken = bearerHeader.split(' ')[1];
         req.token = bearerToken;
         next();
-
     } else {
         res.sendStatus(403);
     }
 }
 
+
+app.post("/user_details",(req,res)=>{
+    var user_data = {
+        "name":req.body.Name,
+        "surName":req.body.surName,
+        "fatherName":req.body.Father_Name,
+        "service":req.body.service_detail,
+        "your_intension":req.body.yes_not,
+        "loan_price":req.body.browser,
+        "mobile_no":req.body.number
+    }
+    var user_res=knex1.user_data(user_data)
+    user_res.then((data)=>{
+        
+        res.redirect('/20_lac_loan')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+    }).catch((err)=>{
+        res.send(err)
+    })
+})
+
+app.post("/add_loan_data",(req,res)=>{
+    res.redirect('/user_loan_submition')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+  
+})
 
 
 app.listen(5000, () => {
