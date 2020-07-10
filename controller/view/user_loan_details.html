@@ -15,7 +15,6 @@
     </style>
 
 </head>
-
 <body>
 
     <form  action="/user_details" method="post" style="border:1px solid #ccc">
@@ -49,9 +48,13 @@
     <input type="text" placeholder="Enter MOBILE number..."  name="number" required>
     <br>
     <br>
+    <label>Which type of user "New", "REJECTED","APPROVED".</label><br>
+    <input type="text" placeholder="Enter your stage"  name="user_stage" required>
+    <br>
+    <br>
     <label for="browser">Which Price Loan do you want:</label>
     <br>
-    <input list="browsers" name="browser" id="browser">
+    <input list="browsers" name="browser" id="browser" required>
     <datalist id="browsers">
         <option value="20 Lac">
         <option value="10 Lac">

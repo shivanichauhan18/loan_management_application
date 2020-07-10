@@ -5,7 +5,7 @@
       <hr>
 
       <label for="name"><b>Name</b></label>
-     <input type="text" name="fullname"></br>
+     <input type="text" name="fullname" required></br>
         <!-- <input type="submit" value="submit"> -->
   
       <label for="email"><b>Email</b></label>
@@ -14,11 +14,14 @@
       <br>
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" required>
-  
       <br>
-      <label for="psw-repeat"><b>Repeat Password</b></label>
-      <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
+
+      <label for="psw"><b>Enter Your Reference Id</b></label>
+      <input type="text" placeholder="Enter Reference id" name="reference_id" required>
       <br>
+
+
+      
   
       <!-- <label>
         <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
@@ -29,8 +32,9 @@
       <div class="clearfix">
         <button type="button" class="cancelbtn">Cancel</button>
         <!-- <button type="submit" class="signupbtn">Sign Up</button> -->
-        <button type="submit" class="loginbtn">
-        <a href="http://localhost:5000/loan_intro">login</a></button>
+        <button type="submit" class="loginbtn">Submit
+        <!-- <!-- <a href="http://localhost:5000/loan_intro">login</a> -->
+        </button>
 
       </div>
     </div>

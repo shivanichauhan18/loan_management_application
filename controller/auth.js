@@ -1,4 +1,6 @@
 const knex1 = require("../model/connection")
+var passwordHash = require('password-hash');
+
 
 const express = require('express');
 const path = require('path');
@@ -27,6 +29,9 @@ app.get('/login_page', function (req, res) {
     res.sendFile(path.join(__dirname + '/view/login_page.html'));
 });
 
+// api publish key === pub-c-c3425c31-6692-497f-a969-8a965161b6d7
+// subscribe key == sub-c-8893ebe6-c032-11ea-a44f-6e05387a1df4
+
 app.get('/loan_intro', function (req, res) {
     res.sendFile(path.join(__dirname + '/view/user_details.html'));
 });
@@ -41,69 +46,115 @@ app.get('/20_lac_loan', function (req, res) {
 });
 
 
+app.get('/10_lac_loan', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/10_Lac_loan_page.html'));
+});
+
+
+app.get('/5_lac_loan', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/5_lac_loan_page.html'));
+});
+
+
+app.get('/2_lac_loan', function (req, res) {
+    res.sendFile(path.join(__dirname + '/view/2_lac_loan_page.html'));
+});
+
+
 app.get('/user_loan_submition', function (req, res) {
     res.sendFile(path.join(__dirname + '/view/user_loan_submition.html'));
 });
 
 
 
-app.post('/sign_up', verifyToken, (req, res, next) => {
-    jwt.verify((req.token), "SECRET_KEY", { algorithms: ['RS256'] }, (err, authData) => {
-        if (err, authData) {
-            console.log(err)
-            res.sendStatus(403);
-        } else {
-            var token_data = {}
-            token_data["token"] = req.token
-            var response = knex1.insert_token(token_data)
-            response.then((data) => {
-                res.json({
-                    message: "Your sign up sucessfully complete"
-                });
-            }).catch((err) => {
-                console.log(err)
-            })
-        }
-      
+app.post('/sign_up', (req, res, next) => {
+
+    let customerDetails={
+        "name": req.body.fullname,
+        "email": req.body.email,
+        "password": req.body.psw,
+        "repead_pwd": req.body.psw_repeat,
+        "user_reference_id":7896
+    }
+    let response = knex1.customerData(customerDetails)
+    response.then((data)=>{
+        res.redirect('/loan_intro')
+    }).catch((err)=>{
+        console.log(err)
+        res.send({"staus":"wrong entry","massage":"your email is already exists pleas use another"})
     })
 });
 
 
 app.post("/login", (req, res, next) => {
-    const user = {
-        "name": req.body.fullname,
-        "emails": req.body.email,
-        "pwd": req.body.psw,
-        "repead_pwd": req.body.psw_repeat,
-    }
-
-    jwt.sign(user, "SECRET_KEY", (err, tokens) => {
-        const user_token = knex1.select()
-        user_token.then((data) => {
-            const str_token = data[1].token
-            if (str_token == tokens) {
-                res.json({
-                    token: "you logged in " 
-                })         
-               }else{
-                res.json({
-                    token: "your email not exists" + tokens
-                })     
-               }
-            })
-
+    let email_id = req.body.email;
+    let password = req.body.psw;
+    let response=knex1.varify_email(email_id)
+    response.then((data)=>{
+        if(data.length==0){
+            res.send("your email is incorect please try again...")
+        }
+        else if(data[0]["password"]==password){
+            let token = jwt.sign({"user":data[0]},"secret_key")
+            // res.cookie(token)
+            jwt.verify(token,"secret_key",(err,result)=>{
+                res.json({"status":"write","massage":"login successful ","token":result})
+            })   
+        }
+        else{
+            res.send("your password is incorect try again....")
+        }
+    }).catch((err)=>{
+        res.send(err)
     })
+
+
+
+    
+    // knex1.varify_email(email)
+    //     .then((result) => {
+    //         if (result.length != 0) {
+    //             var hashedPassword = result[0]['password'];
+    //             var varify_password = passwordHash.verify(password, hashedPassword);
+    //             console.log(varify_password)
+
+    //             if (varify_password == true) {
+    //                 var token = jwt.sign({ "token": result[0].role_id }, 'mishra');
+    //                 res.cookie("success")
+    //                 res.send('login...success')
+    //             }
+    //             else {
+    //                 res.send('wrong password')
+    //                 console.log('wrong password');
+    //             }
+
+    //         }
+
+            // else {
+        //         res.send('wrong email')
+        //         console.log("wrong email")
+        //     }
+        // })
+        // .catch((err) => {
+        //     res.send(err)
+        //     console.log(err)
+        // })
+
+    // })
 })
 
 ///Token verification function.
 
 function verifyToken(req, res, next) {
+    var hashedPassword = passwordHash.generate(req.body.psw)
+    var repead_pwd = passwordHash.generate(req.body.psw_repeat)
+
     const bearerHeader = {
         "sub": "0984999321",
         "name": req.body.fullname,
         "email_NAME": req.body.email,
-        "pwd": req.body.psw,
-        "repead_pwd": req.body.psw_repeat,
+        "pwd": hashedPassword,
+        "repead_pwd": repead_pwd,
         "jti": "a0f65b60-19ec-42aa-b3fd-01f8f50560af",
         "iat": 1573281829,
         "exp": 1573285429
@@ -128,21 +179,44 @@ app.post("/user_details",(req,res)=>{
         "service":req.body.service_detail,
         "your_intension":req.body.yes_not,
         "loan_price":req.body.browser,
-        "mobile_no":req.body.number
+        "mobile_no":req.body.number,
+        "stages":req.body.user_stage,
+        "date_of_creation":new Date()
     }
     var user_res=knex1.user_data(user_data)
     user_res.then((data)=>{
-        
-        res.redirect('/20_lac_loan')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+        if(user_data.loan_price == "20 Lac"){
+            res.redirect('/20_lac_loan')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+        }else if(user_data.loan_price == "10 Lac"){
+            res.redirect('/10_lac_loan')
+        }else if(user_data.loan_price == "5 Lac"){
+            res.redirect('/5_lac_loan')
+        }else if(user_data.loan_price == "2 Lac"){
+            res.redirect('/2_lac_loan') 
+        }else{
+            res.send("your loan out of validity")
+        }
     }).catch((err)=>{
         res.send(err)
     })
 })
 
-app.post("/add_loan_data",(req,res)=>{
+app.post("/loan_type_check",(req,res)=>{
+    var data = req.body.browser
+    if (data == "Home"){
+        res.redirect("/user_loan_intro")
+    }else if(data == "Vahicle"){
+        res.send("vahicle loan")
+    }else{
+        res.send("business loan")
+    }
+})
+
+app.post("/higher_loan_details",(req,res)=>{
     res.redirect('/user_loan_submition')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
   
 })
+
 
 
 app.listen(5000, () => {
